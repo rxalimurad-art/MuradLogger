@@ -40,11 +40,15 @@ final public class MuradLogger: Sendable {
             let appVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?.?.?"
             let buildNumber = bundle.infoDictionary?["CFBundleVersion"] as? String ?? "?"
 
+           
+
             // 📝 Compose log entry
             let logEntry =
             """
             [\(timestamp)]
-            \(getDeviceInfo())
+            App: \(appName) v\(appVersion) (\(buildNumber))
+            Device: \(getDeviceInfo().model) [\(getDeviceInfo().id)]
+            OS: \(getDeviceInfo().os)
             [\(fileName):\(line) → \(function)]
             \(message)
 
