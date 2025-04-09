@@ -44,7 +44,7 @@ final public class MuradLogger: Sendable {
            
 
             // 📝 Compose log entry
-            let logEntry = "[\(timestamp)][\(appName)][\(appVersion)][(\(buildNumber))][\(getDeviceInfo().model)] [\(getDeviceInfo().id)][\(getDeviceInfo().os)][\(fileName):\(line) → \(function)] \(message)"
+            let logEntry = "[\(timestamp)][\(appName)][\(appVersion)][(\(buildNumber))][\(getDeviceInfo().model)] [\(getDeviceInfo().id)][\(getDeviceInfo().os)][\(fileName):\(line) → \(function)] \(message)\n"
 
             if FileManager.default.fileExists(atPath: self.logFileURL.path),
                let handle = try? FileHandle(forWritingTo: self.logFileURL) {
