@@ -44,7 +44,8 @@ final public class MuradLogger: Sendable {
            
 
             // 📝 Compose log entry
-            let logEntry = "[\(timestamp)][\(appName)][\(appVersion)][\(TimeZone.current.identifier)][\(getDeviceInfo().model)][\(getDeviceInfo().id)][\(getDeviceInfo().os)][\(fileName):\(line) → \(function)] \(message)\n"
+            //[\(getDeviceInfo().model)][\(getDeviceInfo().id)]
+            let logEntry = "[\(timestamp)][\(appName)][\(appVersion)][\(TimeZone.current.identifier)][\(getDeviceInfo().os)][\(fileName):\(line) → \(function)] \(message)\n"
 
             if FileManager.default.fileExists(atPath: self.logFileURL.path),
                let handle = try? FileHandle(forWritingTo: self.logFileURL) {
@@ -88,45 +89,7 @@ final public class MuradLogger: Sendable {
 
     // MARK: - Upload current log file only (same as before)
 
-    public func uploadLogFile(to urlString: String, completion: @Sendable @escaping (Result<String, Error>) -> Void) {
-        queue.async { [self] in
-            guard let fileData = try? Data(contentsOf: self.logFileURL),
-                  FileManager.default.fileExists(atPath: self.logFileURL.path),
-                  let url = URL(string: urlString) else {
-                DispatchQueue.main.async {
-                    completion(.failure(NSError(domain: "MuradLogger", code: 400, userInfo: [
-                        NSLocalizedDescriptionKey: "Log file not found or URL is invalid."
-                    ])))
-                }
-                return
-            }
 
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
-            request.httpBody = fileData
-
-            let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-                guard let self = self else { return }
-
-                if let error = error {
-                    DispatchQueue.main.async {
-                        completion(.failure(error))
-                    }
-                    return
-                }
-
-                try? FileManager.default.removeItem(at: self.logFileURL)
-
-                let responseText = data.flatMap { String(data: $0, encoding: .utf8) } ?? "Success with no response body"
-                DispatchQueue.main.async {
-                    completion(.success(responseText))
-                }
-            }
-
-            task.resume()
-        }
-    }
     
     public func clearAllLogs(completion: @Sendable @escaping () -> Void ) {
         queue.async {
