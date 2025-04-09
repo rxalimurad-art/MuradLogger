@@ -127,6 +127,23 @@ final public class MuradLogger: Sendable {
             task.resume()
         }
     }
+    
+    public func clearAllLogs(completion: @Sendable @escaping () -> Void ) {
+        queue.async {
+            let allLogFiles = (try? FileManager.default.contentsOfDirectory(atPath: self.logsDirectory.path)) ?? []
+            let logFiles = allLogFiles.filter { $0.hasPrefix("murad_log") && $0.hasSuffix(".txt") }
+
+            for file in logFiles {
+                let fileURL = self.logsDirectory.appendingPathComponent(file)
+                try? FileManager.default.removeItem(at: fileURL)
+            }
+
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
+    }
+
 
     // MARK: - Return contents of all log files
 
