@@ -131,7 +131,7 @@ final public class MuradLogger: Sendable {
         }
     }
     
-    public func exportAllLogsToFile(named filename: String = "murad_full_log.txt", completion: @escaping (URL?) -> Void) {
+    public func exportAllLogsToFile(named filename: String = "murad_full_log.txt", completion: @Sendable @escaping (URL?) -> Void) {
         readAllLogs { logs in
             let fileURL = self.logsDirectory.appendingPathComponent(filename)
             do {
