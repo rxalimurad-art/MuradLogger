@@ -29,7 +29,9 @@ final public class MuradLogger: Sendable {
 
             let timestamp = ISO8601DateFormatter().string(from: Date())
             let fileName = (file as NSString).lastPathComponent
-            let logEntry = "[\(timestamp)] [\(fileName):\(line) → \(function)] \(message)\n"
+            let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String ?? "UnknownApp"
+
+            let logEntry = "[\(timestamp)] [\(appName)] [\(fileName):\(line) → \(function)] \(message)\n"
 
             if FileManager.default.fileExists(atPath: self.logFileURL.path),
                let handle = try? FileHandle(forWritingTo: self.logFileURL) {
@@ -43,6 +45,7 @@ final public class MuradLogger: Sendable {
             }
         }
     }
+
 
     private func rotateLogFileIfNeeded() {
         guard let fileSize = try? FileManager.default.attributesOfItem(atPath: logFileURL.path)[.size] as? UInt64,
