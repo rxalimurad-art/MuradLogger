@@ -1,17 +1,18 @@
 import Foundation
-#if canImport(UIKit)
-import UIKit
-#endif
+
 
 
 final public class MuradLogger: Sendable {
     public static let shared = MuradLogger()
-    private init() {}
+    private init() {
+        
+    }
 
     private let logFileName = "murad_log.txt"
     private let maxLogFileSize: UInt64 = 100 * 1024 // 100 KB
     private let queue = DispatchQueue(label: "com.murad.logger.queue")
 
+    
     private var logsDirectory: URL {
         FileManager.default.temporaryDirectory
     }
@@ -68,17 +69,12 @@ final public class MuradLogger: Sendable {
     }
 
     private func getDeviceInfo() -> (id: String, model: String, os: String) {
-        #if canImport(UIKit)
-        let id = UIDevice.current.identifierForVendor?.uuidString ?? "UnknownDevice"
-        let model = UIDevice.current.model
+        let id = "SD34E3D32R43TINGF4598"
+        let model = "iPhone 6 Plust"
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
         let os = "iOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
         return (id, model, os)
-        #else
-        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-        let os = "Unknown OS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
-        return ("UnknownDevice", "UnknownModel", os)
-        #endif
+     
     }
 
 
