@@ -1,4 +1,8 @@
 import Foundation
+#if canImport(UIKit)
+import UIKit
+#endif
+
 
 final public class MuradLogger: Sendable {
     public static let shared = MuradLogger()
@@ -29,9 +33,22 @@ final public class MuradLogger: Sendable {
 
             let timestamp = ISO8601DateFormatter().string(from: Date())
             let fileName = (file as NSString).lastPathComponent
-            let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String ?? "UnknownApp"
 
-            let logEntry = "[\(timestamp)] [\(appName)] [\(fileName):\(line) → \(function)] \(message)\n"
+            // 📦 App Info
+            let bundle = Bundle.main
+            let appName = bundle.infoDictionary?["CFBundleName"] as? String ?? "UnknownApp"
+            let appVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?.?.?"
+            let buildNumber = bundle.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+
+            // 📝 Compose log entry
+            let logEntry =
+            """
+            [\(timestamp)]
+            \(getDeviceInfo())
+            [\(fileName):\(line) → \(function)]
+            \(message)
+
+            """
 
             if FileManager.default.fileExists(atPath: self.logFileURL.path),
                let handle = try? FileHandle(forWritingTo: self.logFileURL) {
@@ -44,6 +61,20 @@ final public class MuradLogger: Sendable {
                 try? logEntry.write(to: self.logFileURL, atomically: true, encoding: .utf8)
             }
         }
+    }
+
+    private func getDeviceInfo() -> (id: String, model: String, os: String) {
+        #if canImport(UIKit)
+        let id = UIDevice.current.identifierForVendor?.uuidString ?? "UnknownDevice"
+        let model = UIDevice.current.model
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let os = "iOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
+        return (id, model, os)
+        #else
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let os = "Unknown OS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
+        return ("UnknownDevice", "UnknownModel", os)
+        #endif
     }
 
 
